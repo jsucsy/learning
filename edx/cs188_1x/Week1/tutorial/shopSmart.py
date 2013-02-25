@@ -19,13 +19,35 @@ For orders:  [('apples', 3.0)] best shop is shop2
 
 import shop
 
+def buyLotsOfFruit(orderList):
+    """
+        orderList: List of (fruit, numPounds) tuples
+            
+    Returns cost of order
+    """ 
+    totalCost = 0.0             
+    "*** YOUR CODE HERE ***"
+    for x,y in orderList:
+        totalCost += fruitPrices[x] * y
+    #[totalCost += fruitPrices[x] * y for x,y in orderList]
+    return totalCost
+
 def shopSmart(orderList, fruitShops):
     """
         orderList: List of (fruit, numPound) tuples
         fruitShops: List of FruitShops
     """    
     "*** YOUR CODE HERE ***"
-    return None
+    best = (None, None)
+    for shop in fruitShops:
+        totalCost = 0.0             
+        for x,y in orderList:
+            totalCost += shop.fruitPrices[x] * y
+        #print "%s|%s" % (shop.getName(), totalCost) 
+        if (best[1] == None or totalCost < best[1]):
+            best = (shop, totalCost)
+    
+    return best[0]
     
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"
