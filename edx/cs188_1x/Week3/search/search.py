@@ -86,7 +86,19 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     path = []
     currState = problem.getStartState()
+    print currState
     path.append(currState)
+    print "Start state:", currState
+    print "Is the state a goal?", problem.isGoalState(currState)
+    print "State's successors:", problem.getSuccessors(currState)
+    fringe = util.Stack()
+    for successor in problem.getSuccessors(currState):
+        fringe.push(successor)
+    
+    currState = fringe.pop()[0]
+    print currState
+    path.append(currState)
+    
     print "Next state:", currState
     print "Is the state a goal?", problem.isGoalState(currState)
     print "State's successors:", problem.getSuccessors(currState)
@@ -94,18 +106,8 @@ def depthFirstSearch(problem):
     for successor in problem.getSuccessors(currState):
         fringe.push(successor)
     
-    currState = fringe.pop()
-    path.append(currState)[1]
-    
-    print "Next state:", currState
-    print "Is the state a goal?", problem.isGoalState(currState)
-    print "State's successors:", problem.getSuccessors(currState)
-    fringe = util.Stack()
-    for successor in problem.getSuccessors(currState):
-        fringe.push(successor)
-    
-    currState = fringe.pop()
-    path.append(currState)[1]
+    currState = fringe.pop()[0]
+    path.append(currState)
     
     print "Next state:", currState
     print "Is the state a goal?", problem.isGoalState(currState)
