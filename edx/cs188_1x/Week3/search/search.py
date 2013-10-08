@@ -84,63 +84,23 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    path = []
-    currState = problem.getStartState()
-    print currState
-    path.append(currState)
-    print "Start state:", currState
-    print "Is the state a goal?", problem.isGoalState(currState)
-    print "State's successors:", problem.getSuccessors(currState)
-    fringe = util.Stack()
-    for successor in problem.getSuccessors(currState):
-        fringe.push(successor)
-    
-    currState = fringe.pop()[0]
-    print currState
-    path.append(currState)
-    
-    print "Next state:", currState
-    print "Is the state a goal?", problem.isGoalState(currState)
-    print "State's successors:", problem.getSuccessors(currState)
-    fringe = util.Stack()
-    for successor in problem.getSuccessors(currState):
-        fringe.push(successor)
-    
-    currState = fringe.pop()[0]
-    path.append(currState)
-    
-    print "Next state:", currState
-    print "Is the state a goal?", problem.isGoalState(currState)
-    print "State's successors:", problem.getSuccessors(currState)
-    fringe = util.Stack()
-    for successor in problem.getSuccessors(problem.getStartState()):
-        fringe.push(successor)
-    
-    return path
-    #######Attempt 1###############
 #    print "Start:", problem.getStartState()
 #    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
 #    print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    #path = util.Queue()
-#    path = []
-#    fringe = util.Stack()
-#    #print path
-#    currState = problem.getStartState()
-#    
-#    while not problem.isGoalState(currState):
-#        path.append(currState)
-#        print problem.getSuccessors(currState)
-#        for successor in problem.getSuccessors(currState):
-#            #print "Pushing: ", successor
-#            fringe.push(successor[0])
-#        #path.push(currState)
-#        currState = fringe.pop()
-#        print "State: %s| isGoal: %s" % (currState, problem.isGoalState(currState))
-#        
-#    print "|".join(path)
-#    
-#    print problem.isGoalState(currState)
-#    return path
+    path = util.Queue()
+    fringe = util.Stack()
+    successors = []
+    #print path
+    currState = problem.getStartState()
+    for successor in problem.getSuccessors(currState):
+        print "Pushing: ", successor
+        fringe.push(successor)
+    
+    path.push(currState)
+    
+    
+    print problem.isGoalState(currState)
+    util.raiseNotDefined()
     
 
 def breadthFirstSearch(problem):
