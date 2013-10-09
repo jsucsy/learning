@@ -39,14 +39,14 @@ def read_orders(arg):
     symbols = list(set(symbols))
     
     #print sorted(dates), sorted(symbols)
-    print trades
-    return dates, symbols, trades
+    print "\r\nTrades:\r\n", trades
+    return sorted(dates), sorted(symbols), trades
 
 def get_mkt_data(dates, symbols):
     dataobj = da.DataAccess('Yahoo')
     ls_keys = ['open', 'high', 'low', 'close', 'volume', 'actual_close']
     
-    mkt_data = dataobj.get_data(dates, symbols, ls_keys)
+    mkt_data = dataobj.get_data(sorted(dates), symbols, ls_keys)
     mkt_data = dict(zip(ls_keys, mkt_data))
     
     for s_key in ls_keys:
@@ -54,25 +54,46 @@ def get_mkt_data(dates, symbols):
         mkt_data[s_key] = mkt_data[s_key].fillna(method = 'bfill')
         mkt_data[s_key] = mkt_data[s_key].fillna(1.0)
     
-    print mkt_data['close']
-    return mkt_data['close']
+    df_close= mkt_data['close']
+    df_close['_CASH'] = 1.0
+    print "\r\nMarket data:\r\n", df_close
+    return df_close
 
 def create_trade_matrix(dates, symbols, trades):
-    trade_matrix = pd.DataFrame(index=sorted(dates))
+    symbols.append('_CASH')
+    trade_matrix = pd.DataFrame(index=dates)
     for column in symbols:
         trade_matrix[column] = 0
         
     for trade in trades:
-        qty = trade[3] * (1 if trade[2] == 'Buy' else -1)
-        trade_matrix[trade[1]][trade[0]] = qty
-    print trade_matrix
+        qty = trade[3] * (-1 if trade[2] == 'Buy' else 1)
+        trade_matrix[trade[1]][trade[0]] += qty
+    print "\r\nTrade matrix:\r\n", trade_matrix
     
     return trade_matrix
 
+def create_cash_series(dates, mkt_data, trade_matrix, start_cash):
+    cash_series = pd.TimeSeries(0,dates)
+    cash_series[0] = start_cash
+    trade_flow = trade_matrix * mkt_data
+    print "\r\nTrade flow:\r\n", trade_flow
+    
+    cash_series += trade_flow.sum(axis=1)
+    
+    print "\r\nCash series:\r\n", cash_series
+    print "\r\nCash total: \r\n", cash_series.sum(axis=0)
+    
+    return cash_series
+
 if __name__ == '__main__':
-    dates, symbols, trades = read_orders(sys.argv[2])
+    start_cash = sys.argv[1]
+    order_file = sys.argv[2]
+    out_file = sys.argv[3]
+    
+    dates, symbols, trades = read_orders(order_file)
     mkt_data = get_mkt_data(dates, symbols)
     trade_matrix = create_trade_matrix(dates, symbols, trades)
-    
-    
+    cash_series = create_cash_series(dates,mkt_data,trade_matrix, start_cash)
+    trade_matrix['_CASH'] = cash_series
+    print "\r\nTrade series + cash:\r\n", cash_series
     
