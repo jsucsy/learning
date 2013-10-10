@@ -18,7 +18,7 @@ import pandas as pd
 import numpy as np
 
 #native imports
-import sys
+import sys, csv
 
 def read_orders(arg):
     dates = []
@@ -85,15 +85,40 @@ def create_cash_series(dates, mkt_data, trade_matrix, start_cash):
     
     return cash_series
 
+def create_output(out_file, dates, mkt_data, trade_matrix, cash_series, holding_matrix):
+#    with open(out_file, 'wb+') as dest:
+#        for row_index in mkt_data.index:
+#            dest.write("%s|%s|\r\n" % (row_index, mkt_data[row_index]))
+    writer = csv.writer(open(out_file,'wb'), delimiter=',')
+    for row_index in portfolio:
+        print row_index
+        print portfolio[row_index]
+        row_to_enter = [row_index,portfolio[row_index]]
+        writer.writerow(row_to_enter)
+
+
 if __name__ == '__main__':
     start_cash = sys.argv[1]
     order_file = sys.argv[2]
     out_file = sys.argv[3]
     
     dates, symbols, trades = read_orders(order_file)
+    dates = sorted(dates)
+        
+    dt_timeofday = dt.timedelta(hours=16)
+    dates = du.getNYSEdays(dates[0], dates[-1], dt_timeofday)
+    print dates
+
     mkt_data = get_mkt_data(dates, symbols)
     trade_matrix = create_trade_matrix(dates, symbols, trades)
     cash_series = create_cash_series(dates,mkt_data,trade_matrix, start_cash)
     trade_matrix['_CASH'] = cash_series
-    print "\r\nTrade series + cash:\r\n", cash_series
+    print "\r\nTrade series + cash:\r\n", trade_matrix
     
+    holding_matrix = trade_matrix.cumsum(axis=0)
+    print "\r\nHolding matrix:\r\n", holding_matrix
+    
+    portfolio = holding_matrix.dot(mkt_data)
+    print "\r\nPortfolio:\r\n", portfolio
+    
+    create_output(out_file, dates, mkt_data, trade_matrix, cash_series, holding_matrix, portfolio)
